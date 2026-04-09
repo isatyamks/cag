@@ -45,12 +45,11 @@ def main():
 
         # Compare
         print(f"\n[Comparison]")
-        print(f"  Time Difference: CAG is {(rag_result['time'] - cag_result['time']):.4f}s faster")
-        if cag_result['time'] > 0:
-            print(f"  Latency Speedup: {rag_result['time'] / cag_result['time']:.2f}x")
-        else:
-            print("  Latency Speedup: N/A")
         print(f"  Tokens Saved per Query: {rag_result['input_len'] - cag_result['input_len']}")
+        x_ratio = rag_result['input_len'] / cag_result['input_len']
+
+        print(f"for Rag: {'-' * int(5*x_ratio)}")
+        print(f"for CAG: {'-' * 5}")
 
 if __name__ == "__main__":
     main()
