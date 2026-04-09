@@ -4,6 +4,12 @@ from src.clean import clean_up
 from src.prompts import build_rag_prompt
 from src.config import CLOSE_AND_OPEN
 
+class Colors:
+    GREEN = '\033[92m'
+    RED = '\033[91m'
+    BOLD = '\033[1m'
+    END = '\033[0m'
+
 class BenchmarkRunner:
     def __init__(self, model, tokenizer, doc_text):
         self.model = model
@@ -47,8 +53,9 @@ class BenchmarkRunner:
         }
     
     def print_results(self, title: str, results: dict, prompt_label: str):
-        print(f"\n[{title} Response]")
+        color = Colors.GREEN if title == "CAG" else Colors.RED
+        print(f"\n{color}{Colors.BOLD}[{title} Response]{Colors.END}")
         print(f"Answer: {results['answer']}")
-        print(f"Metrics:")
-        print(f"  Prompt Tokens ({prompt_label}): {results['input_len']}")
-        print(f"  Output Tokens:                {results['output_len']}")
+        print(f"{color}Metrics:{Colors.END}")
+        print(f"  Prompt Tokens ({prompt_label}): \033[1m{results['input_len']}\033[0m")
+        print(f"  Output Tokens:                \033[1m{results['output_len']}\033[0m")
