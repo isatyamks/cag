@@ -22,7 +22,7 @@ def main():
     print("\nStarting Interactive Benchmark (Type 'exit' to quit)")
     print("-" * 60)
 
-    total_cag_tokens_processed = origin_len  # CAG pays the origin_len cost ONCE
+    total_cag_tokens_processed = origin_len
     total_rag_tokens_processed = 0
     query_count = 0
 
@@ -36,23 +36,17 @@ def main():
 
         print("\n--- Processing ---")
 
-        # Run CAG
         cag_result = runner.run_cag(question, cache, origin_len)
-        
-        # Run RAG
         rag_result = runner.run_rag(question)
 
-        # Print
         print(f"\nQuestion: {question}")
         runner.print_results("CAG", cag_result, "Actual Input")
         runner.print_results("RAG", rag_result, "Full Context")
 
-        # Update cumulatives
         query_count += 1
         total_cag_tokens_processed += cag_result['input_len']
         total_rag_tokens_processed += rag_result['input_len']
 
-        # Compare
         print(f"\n\033[93m\033[1m[Comparison - Query #{query_count}]\033[0m")
         
         tokens_saved = rag_result['input_len'] - cag_result['input_len']

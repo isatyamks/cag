@@ -1,12 +1,11 @@
 import torch
 from transformers.cache_utils import DynamicCache
 
-
 def get_kv_cache(model, tokenizer, prompt: str) -> DynamicCache:
     device = model.model.embed_tokens.weight.device
     input_ids = tokenizer(prompt, return_tensors="pt").input_ids.to(device)
 
-    cache = DynamicCache()  #initialize empty cache
+    cache = DynamicCache()
 
     with torch.no_grad():
         _ = model(
@@ -15,4 +14,3 @@ def get_kv_cache(model, tokenizer, prompt: str) -> DynamicCache:
             use_cache=True
         )
     return cache
-
