@@ -45,3 +45,6 @@ venv.bak/
 .mypy_cache/
 cag_cache/
 *.cache
+
+report_modular/
+src/__pycache__/

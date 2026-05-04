@@ -1,14 +1,15 @@
 import matplotlib.pyplot as plt
 
 class LivePlotter:
-    def __init__(self):
+    def __init__(self, cag_setup_cost: int):
+        self.cag_setup_cost = cag_setup_cost
         plt.ion()
         self.fig, self.ax = plt.subplots(figsize=(8, 5))
         self.fig.canvas.manager.set_window_title("CAG vs RAG Token Usage")
         
         # Data storage
         self.queries = [0]
-        self.cag_tokens = [0]
+        self.cag_tokens = [self.cag_setup_cost]
         self.rag_tokens = [0]
         
         # Plot lines
@@ -28,9 +29,9 @@ class LivePlotter:
         plt.tight_layout()
         plt.pause(0.1)
 
-    def update(self, query_num: int, total_cag: int, total_rag: int):
+    def update(self, query_num: int, total_cag_new: int, total_rag: int):
         self.queries.append(query_num)
-        self.cag_tokens.append(total_cag)
+        self.cag_tokens.append(self.cag_setup_cost + total_cag_new)
         self.rag_tokens.append(total_rag)
         
         self.line_cag.set_data(self.queries, self.cag_tokens)
