@@ -160,10 +160,10 @@ def print_unified_result(query_count: int, cag_result: dict, rag_result: dict,
     ]
 
     r_lat = [
+        _kv("Retrieval (BM25)", f"{rm.get('retrieval_ms', 0)} ms", YELLOW, WHITE, True),
         _kv("Tokenize",       f"{rm['tokenization_ms']} ms", YELLOW, WHITE, True),
         _kv("Forward Pass",   f"{rm['forward_pass_ms']} ms", YELLOW, WHITE, True),
         _kv("Decode",         f"{rm['decode_ms']} ms", YELLOW, WHITE, True),
-        "",
         _kv("Total Latency",  f"{rm['total_ms']} ms", YELLOW, YELLOW)
     ]
 

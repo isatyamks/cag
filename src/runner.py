@@ -9,6 +9,7 @@ from src.token_utils import (
     count_cag_format_tokens,
     compute_cache_size_mb,
 )
+from src.retriever import SimpleRetriever
 
 
 class BenchmarkRunner:
@@ -17,6 +18,7 @@ class BenchmarkRunner:
         self.tokenizer = tokenizer
         self.doc_text  = doc_text
         self._cag_fmt  = count_cag_format_tokens(tokenizer)
+        self.retriever = SimpleRetriever(doc_text)
 
         # Calculate RAG system text vs format overhead
         from src.prompts import get_rag_system_messages, build_rag_prompt
@@ -79,13 +81,19 @@ class BenchmarkRunner:
     def run_rag(self, question: str) -> dict:
         trace = []
 
+        # 1. RAG Retrieval Step
+        t_ret_start = time.time()
+        retrieved_context = self.retriever.retrieve(question)
+        t_ret_ms = (time.time() - t_ret_start) * 1000
+        
+        # 2. Tokenization Step
         t0 = time.time()
-        prompt      = build_rag_prompt(self.tokenizer, self.doc_text, question)
+        prompt      = build_rag_prompt(self.tokenizer, retrieved_context, question)
         input_ids   = self.tokenizer(prompt, return_tensors="pt").input_ids
         full_tokens = input_ids.shape[-1]
 
         raw_q_tokens  = count_raw_question_tokens(self.tokenizer, question)
-        ctx_tokens    = count_raw_question_tokens(self.tokenizer, self.doc_text)
+        ctx_tokens    = count_raw_question_tokens(self.tokenizer, retrieved_context)
         sys_tokens    = self._rag_sys_tokens
         fmt_tokens    = full_tokens - raw_q_tokens - ctx_tokens - sys_tokens
         t_token = (time.time() - t0) * 1000
@@ -110,9 +118,10 @@ class BenchmarkRunner:
                 "fmt_overhead_tokens":  fmt_tokens,
                 "full_tokens_encoded":  full_tokens,
                 "generated_tokens":     output_len,
+                "retrieval_ms":         round(t_ret_ms),
                 "tokenization_ms":      round(t_token),
                 "forward_pass_ms":      round(prefill_ms),
                 "decode_ms":            round(decode_ms),
-                "total_ms":             round(sum(t["time_ms"] for t in trace)),
+                "total_ms":             round(t_ret_ms + t_token + prefill_ms + decode_ms),
             },
         }
