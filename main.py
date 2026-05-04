@@ -5,28 +5,21 @@ from src.cag_cache_manager import build_and_save_cache
 from src.runner import BenchmarkRunner
 from src.display import print_unified_result
 from src.plotter import LivePlotter
-from src.wiki_scraper import get_wiki_text
 
 
 def main():
     print(f"Loading {MODEL_NAME}...")
     tokenizer, model = load_model_and_tokenizer(MODEL_NAME, HF_TOKEN)
     print(f"Loaded {MODEL_NAME}.")
-    
-    print("\n" + "="*60)
-    topic = input("Enter a Wikipedia topic to chat about (e.g., 'India', 'Quantum Mechanics'): ").strip()
-    if not topic:
-        topic = "India"
-        print(f"No topic entered. Defaulting to '{topic}'.")
-        
-    doc_text = get_wiki_text(topic)
-    if not doc_text:
-        print("\nUsing offline default text instead.")
-        doc_text = "India is a diverse country with a rich history and a fast-growing economy."
-        topic = "India_Offline"
-        
-    cache_filename = f"{topic.replace(' ', '_')}.cache"
 
+    print("\n" + "=" * 60)
+    topic = "India"
+    print(f"Loading document context from data/{topic}.txt...")
+
+    with open(f"data/{topic}.txt", "r", encoding="utf-8") as f:
+        doc_text = f.read()
+
+    cache_filename = f"{topic}.cache"
     system_prompt = build_cag_prompt(tokenizer, doc_text)
     cache, origin_len = build_and_save_cache(
         model, tokenizer, system_prompt, CACHE_DIR, cache_filename=cache_filename
@@ -63,7 +56,7 @@ def main():
         print_unified_result(
             query_count, cag_result, rag_result, total_cag_encoded, total_rag_encoded
         )
-        
+
         plotter.update(query_count, total_cag_encoded, total_rag_encoded)
 
 
