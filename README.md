@@ -6,7 +6,7 @@
 
 ## Demo
 
-<video src="Demo.mp4" controls width="100%"></video>
+[![Demo](https://img.youtube.com/vi/egNw90ooJ4U/maxresdefault.jpg)](https://youtu.be/egNw90ooJ4U)
 
 ---
 

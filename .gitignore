@@ -51,5 +51,6 @@ report_modular/
 screenshots/
 
 # Large media / recordings (only non-demo ones)
+*.mp4
 *.avi
 *.mov
