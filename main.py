@@ -1,10 +1,7 @@
-from src.config import MODEL_NAME, HF_TOKEN, CACHE_DIR
-from src.model_utils import load_model_and_tokenizer
-from src.prompts import build_cag_prompt
-from src.cag_cache_manager import build_and_save_cache
-from src.runner import BenchmarkRunner
-from src.display import print_unified_result
-from src.plotter import LivePlotter
+from src.core.config import MODEL_NAME, HF_TOKEN, CACHE_DIR
+from src.llm import load_model_and_tokenizer, build_cag_prompt
+from src.cache import build_and_save_cache
+from src.evaluation import BenchmarkSession
 
 
 def main():
@@ -19,45 +16,13 @@ def main():
     with open(f"data/{topic}.txt", "r", encoding="utf-8") as f:
         doc_text = f.read()
 
-    cache_filename = f"{topic}.cache"
     system_prompt = build_cag_prompt(tokenizer, doc_text)
     cache, origin_len = build_and_save_cache(
-        model, tokenizer, system_prompt, CACHE_DIR, cache_filename=cache_filename
+        model, tokenizer, system_prompt, CACHE_DIR, cache_filename=f"{topic}.cache"
     )
 
-    runner = BenchmarkRunner(model, tokenizer, doc_text)
-
-    print("\nStarting Interactive Benchmark (Type 'exit' to quit)")
-    print("-" * 60)
-
-    plotter = LivePlotter(cag_setup_cost=origin_len)
-
-    total_cag_encoded = 0
-    total_rag_encoded = 0
-    query_count = 0
-
-    while True:
-        try:
-            question = input("\nEnter the Question:\n")
-            if question.strip().lower() == "exit":
-                break
-        except (EOFError, KeyboardInterrupt):
-            break
-
-        print("\n--- Processing ---")
-
-        cag_result = runner.run_cag(question, cache, origin_len)
-        rag_result = runner.run_rag(question)
-
-        query_count += 1
-        total_cag_encoded += cag_result["metrics"]["new_tokens_encoded"]
-        total_rag_encoded += rag_result["metrics"]["full_tokens_encoded"]
-
-        print_unified_result(
-            query_count, cag_result, rag_result, total_cag_encoded, total_rag_encoded
-        )
-
-        plotter.update(query_count, total_cag_encoded, total_rag_encoded)
+    session = BenchmarkSession(model, tokenizer, doc_text, cache, origin_len)
+    session.start()
 
 
 if __name__ == "__main__":
