@@ -6,9 +6,7 @@
 
 ## Demo
 
-https://github.com/user-attachments/assets/Recording-2026-05-05-132102.mp4
-
-> *If the video doesn't play above, open [`Recording 2026-05-05 132102.mp4`](./Recording%202026-05-05%20132102.mp4) directly.*
+<video src="Demo.mp4" controls width="100%"></video>
 
 ---
 
