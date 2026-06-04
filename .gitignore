@@ -28,6 +28,7 @@ MANIFEST
 
 # Environment
 .env
+.env.*
 .venv
 env/
 venv/
@@ -47,4 +48,8 @@ cag_cache/
 *.cache
 data/
 report_modular/
-screenshots/    
+screenshots/
+
+# Large media / recordings (only non-demo ones)
+*.avi
+*.mov
